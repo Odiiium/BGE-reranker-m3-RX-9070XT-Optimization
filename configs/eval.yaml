@@ -1,0 +1,26 @@
+# Evaluation suite: which slices to run, which metrics, and the time budget.
+
+datasets_config: configs/datasets.yaml
+data_dir: data
+output_dir: results
+
+datasets:
+  - trec-dl-2019
+  - trec-dl-2020
+  - scifact
+  - nfcorpus
+  - fiqa
+  - trec-covid
+  - scidocs
+  - arguana
+  - quora
+  - miracl-ru
+  - miracl-en
+
+# Metric passes: every metric is computed at every cutoff from the same reranked lists
+# (one inference pass, several metric passes).
+metrics: [ndcg, mrr, recall]
+ks: [1, 5, 10]
+
+# Hard budget for the whole suite on one RX 9070 XT. The runner prints ETA and warns when exceeded.
+time_budget_minutes: 45

@@ -1,0 +1,21 @@
+# V0 baseline: stock transformers model, fp16 + PyTorch SDPA (AOTriton on ROCm), no compilation.
+# Input pipeline mirrors FlagEmbedding's FlagReranker.compute_score (query truncated to 3/4 of max_length,
+# passage truncated 'only_second', pairs sorted by token length before batching).
+
+name: v0-baseline
+version: 0.1.0
+implementation: hf-cross-encoder     # key in bgeopt.models registry
+
+model_id: BAAI/bge-reranker-v2-m3
+revision: 953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e
+
+device: cuda
+dtype: float16                       # fp32 is 20-30x slower on gfx1201 (untuned fp32 GEMM kernels)
+attn_implementation: sdpa
+
+max_length: 512
+query_max_length: 384
+batch_size: 32
+sort_by_length: true
+
+warmup_iterations: 3

@@ -1,0 +1,89 @@
+# Dataset slices for reranking evaluation.
+#
+# A slice = sampled queries x top_k first-stage candidates + relevance judgments (qrels).
+# The suite (~5k queries, ~500k pairs) is sized to take ~50-65% of the 45-minute budget for the slowest model
+# (V0 baseline, fp16) on a single RX 9070 XT, and mixes pair lengths from ~30 tokens (quora) to the 512 cap (arguana).
+# Changing any field of a slice triggers a rebuild of that slice on the next run.
+
+defaults:
+  top_k: 100                # candidates per query passed to the reranker
+  seed: 42                  # query sampling seed
+  relevance_threshold: 1    # min qrel grade counted as relevant by MRR / Recall (nDCG always uses graded gains)
+  max_queries: null         # null = all eligible queries (with at least one relevant judgment)
+
+datasets:
+  # --- MS MARCO passage, TREC Deep Learning track: deep graded judgments (0..3), short passages ---
+  trec-dl-2019:
+    source: trec_dl
+    language: en
+    year: 2019              # 43 judged queries; BM25 top-100 re-ranked from the official top-1000 pool
+    relevance_threshold: 2  # official binary threshold for TREC DL passage metrics
+  trec-dl-2020:
+    source: trec_dl
+    language: en
+    year: 2020              # 54 judged queries
+    relevance_threshold: 2
+
+  # --- BEIR (MTEB copies): BM25 top-100 over the full corpus ---
+  scifact:
+    source: beir
+    language: en
+    hf_repo: mteb/scifact
+    revision: cf10ab6856b15b0e670ef8ae5dae4e266c12d035
+    split: test             # 300 queries, scientific claims vs abstracts (long documents)
+  nfcorpus:
+    source: beir
+    language: en
+    hf_repo: mteb/nfcorpus
+    revision: 52ac3f19d3449632d9f00aab0ad34a110fc03816
+    split: test             # 323 queries, medical, many graded relevant docs per query
+  fiqa:
+    source: beir
+    language: en
+    hf_repo: mteb/fiqa
+    revision: 5e59eeb3a7df6b85882112b747008547c21587ea
+    split: test             # 648 queries, financial QA
+  trec-covid:
+    source: beir
+    language: en
+    hf_repo: mteb/trec-covid
+    revision: 0724773f091de506941c2108e1647af956de07f7
+    split: test             # 50 queries, deep graded judgments (0..2)
+  scidocs:
+    source: beir
+    language: en
+    hf_repo: mteb/scidocs
+    revision: 490848228d0a9ca7a7244f5e77d8fe33e6df6974
+    split: test             # 1000 queries, citation prediction (paper title -> cited abstracts), medium length
+  arguana:
+    source: beir
+    language: en
+    hf_repo: mteb/arguana
+    revision: 6c1bcf74b13dfd823aff056b79d4d93e702f19c7
+    split: test             # 1406 queries, counter-argument retrieval: long queries AND long documents
+    exclude_identical_ids: true
+    max_queries: 500
+  quora:
+    source: beir
+    language: en
+    hf_repo: mteb/quora
+    revision: 7f060c1bdc9b3d5161eecc05aa59921bca4dd185
+    split: test             # 10000 queries, duplicate questions: very short pairs (CPU-bound latency regime)
+    exclude_identical_ids: true
+    max_queries: 400
+
+  # --- MIRACL reranking (MMTEB): ready-made top-100 candidates, Wikipedia passages ---
+  miracl-ru:
+    source: miracl_reranking
+    language: ru
+    hf_repo: mteb/MIRACLReranking
+    revision: ab6f54eff185a84bc1f6ab96b56bc7df87433228
+    lang: ru
+    split: dev              # 997 queries with a relevant candidate
+  miracl-en:
+    source: miracl_reranking
+    language: en
+    hf_repo: mteb/MIRACLReranking
+    revision: ab6f54eff185a84bc1f6ab96b56bc7df87433228
+    lang: en
+    split: dev              # 705 queries with a relevant candidate

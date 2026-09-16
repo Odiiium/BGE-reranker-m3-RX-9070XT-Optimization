@@ -1,0 +1,25 @@
+[project]
+name = "bgeopt"
+version = "0.1.0"
+description = "Latency optimization of BAAI/bge-reranker-v2-m3 for AMD RDNA4 (RX 9070 XT) with Triton/ROCm"
+requires-python = ">=3.12"
+# torch / triton come from the ROCm wheels already installed in the shared venv (../.venv),
+# so they are intentionally not listed here to avoid pip replacing them with CUDA builds.
+dependencies = [
+    "transformers>=5.0",
+    "huggingface_hub",
+    "numpy",
+    "pandas",
+    "pyarrow",
+    "pyyaml",
+    "tqdm",
+    "bm25s==0.3.11",
+    "PyStemmer==3.1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

@@ -1,0 +1,45 @@
+# Private working notes and research scratch (not part of the pipeline)
+/PLAN.md
+/exploration/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+/build/
+/dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Downloaded / generated datasets (rebuilt by `make data`)
+/data/
+
+# Evaluation outputs (one folder per run)
+/results/
+
+# Experiment trackers, profiler traces, logs
+wandb/
+mlruns/
+*.log
+*.prof
+
+# Kernel / compiler / tuning caches (hardware-specific, regenerated at runtime)
+.triton/
+torchinductor_*/
+tunableop_results*.csv
+
+# Local environment and secrets
+.env
+.env.*
+
+# Editors / OS / tools
+.idea/
+.vscode/
+.claude/
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
