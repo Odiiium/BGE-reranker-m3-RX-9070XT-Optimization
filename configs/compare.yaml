@@ -1,0 +1,21 @@
+# Thresholds for comparing a candidate version against the baseline (scripts/compare.py).
+
+quality:
+  # A metric difference counts as "equivalent" when its 90% paired-bootstrap CI lies within +-margin (TOST, alpha=0.05).
+  equivalence_margin: 0.005
+  bootstrap_samples: 2000
+  permutations: 5000
+  seed: 0
+
+parity:
+  # Numerical parity gates on raw scores of the same (query, candidate) pairs.
+  # Calibrated on V0 noise-floor runs (fp16 with different batch shapes, bf16, eager attention) — see README.
+  min_kendall_tau_median: 0.99
+  min_overlap_at_10: 0.98
+
+latency:
+  bootstrap_samples: 2000
+  seed: 0
+  # A latency change counts when the 95% CI of the p50 speedup excludes 1 AND |effect| >= min_effect.
+  # The CI is a Welch t-interval over per-session p50 (sessions = independent processes); see comparison/latency.py.
+  min_effect: 0.03

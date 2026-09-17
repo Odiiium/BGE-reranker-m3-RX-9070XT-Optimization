@@ -60,3 +60,11 @@ class WordOverlapReranker(BaseReranker):
 
     def predict(self, prepared: PreparedInput) -> np.ndarray:
         return np.asarray(prepared.payload, dtype=np.float32)
+
+
+@register_reranker("test-reversed-overlap")
+class ReversedOverlapReranker(WordOverlapReranker):
+    """Deliberately broken variant: inverts the ranking."""
+
+    def predict(self, prepared: PreparedInput) -> np.ndarray:
+        return -super().predict(prepared)

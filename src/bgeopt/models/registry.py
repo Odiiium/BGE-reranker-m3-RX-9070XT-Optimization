@@ -33,9 +33,20 @@ def available_rerankers() -> list[str]:
     return sorted(set(_REGISTRY) | set(BUILTIN_IMPLEMENTATIONS))
 
 
+def load_model_config(path: str | Path, overrides: list[str] | None = None) -> dict[str, Any]:
+    """Read a model YAML and apply KEY=VALUE overrides (values parsed as YAML: 'false', '16', 'bfloat16')."""
+    config = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    for item in overrides or []:
+        key, sep, value = item.partition("=")
+        if not sep or not key:
+            raise ValueError(f"override must look like key=value, got '{item}'")
+        config[key.strip()] = yaml.safe_load(value)
+    return config
+
+
 def build_reranker(config: dict[str, Any] | str | Path) -> BaseReranker:
     if not isinstance(config, dict):
-        config = yaml.safe_load(Path(config).read_text(encoding="utf-8"))
+        config = load_model_config(config)
     key = config.get("implementation")
     if key not in _REGISTRY and key in BUILTIN_IMPLEMENTATIONS:
         importlib.import_module(BUILTIN_IMPLEMENTATIONS[key])

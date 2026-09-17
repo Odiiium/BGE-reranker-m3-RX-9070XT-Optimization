@@ -1,0 +1,43 @@
+# Controlled latency benchmark (scripts/benchmark.py), separate from the quality suite.
+#
+# Two workloads per session:
+#   synthetic — one query with N candidates of exactly L tokens (no padding): kernel/batch-shape behaviour
+#   replay    — real queries from the evaluation slices (real lengths, padding): user-facing latency
+# Every session runs in a fresh process; with several models, sessions are interleaved (A B, B A, A B ...).
+
+output_dir: results/latency
+eval_config: configs/eval.yaml   # replay datasets default to its slice list
+seed: 1234
+
+profiles:
+  default:                       # ~12 min for V0; together with the quality suite ~35 of the 45-minute budget
+    sessions: 3
+    synthetic:
+      candidates: [1, 8, 32, 100]
+      pair_tokens: [64, 128, 256, 512]
+      query_tokens: 16
+      warmup: 10
+      target_seconds: 4.0        # measured reps per cell = target / estimated latency, clamped to [min_reps, max_reps]
+      min_reps: 30
+      max_reps: 200
+    replay:
+      datasets: null             # null = all slices of eval_config
+      queries_per_dataset: 20
+      repeats: 2
+      warmup_queries: 3
+
+  quick:                         # ~4 min: iteration during kernel development, same cells and queries as default;
+    sessions: 2                  # 2 sessions so session-to-session noise is measurable. Compare quick only with quick.
+    synthetic:
+      candidates: [1, 8, 32, 100]
+      pair_tokens: [64, 128, 256, 512]
+      query_tokens: 16
+      warmup: 5
+      target_seconds: 1.5
+      min_reps: 15
+      max_reps: 100
+    replay:
+      datasets: null
+      queries_per_dataset: 20
+      repeats: 1
+      warmup_queries: 2

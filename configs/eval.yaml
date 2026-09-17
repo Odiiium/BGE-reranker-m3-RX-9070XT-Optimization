@@ -2,7 +2,7 @@
 
 datasets_config: configs/datasets.yaml
 data_dir: data
-output_dir: results
+output_dir: results/quality
 
 datasets:
   - trec-dl-2019
